@@ -7,6 +7,7 @@
 
 #include <fdt.h>
 #include <libfdt.h>
+#include <stdio.h>
 
 #include "libfdt_internal.h"
 
@@ -209,7 +210,10 @@ uint32_t fdt_next_tag(const void *fdt, int startoffset, int *nextoffset)
 	case FDT_NOP:
 		break;
 
+        case 0:
+                puts("wut");
 	default:
+                puts("default");
 		return FDT_END;
 	}
 
