@@ -26,6 +26,9 @@ unsigned long long atoull(const char *num);
 long strtol(const char *nptr, char **endptr, int base);
 long long strtoll(const char *nptr, char **endptr, int base);
 
+double strtod(const char *nptr, char **endptr);
+int abs(int j);
+
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
