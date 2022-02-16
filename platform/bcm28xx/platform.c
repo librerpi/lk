@@ -13,17 +13,26 @@
 #include <dev/uart.h>
 #include <arch.h>
 #include <lk/init.h>
-#include <kernel/vm.h>
 #include <kernel/spinlock.h>
-#include <dev/timer/arm_generic.h>
+#include <dev/gpio.h>
+
+#if ARCH_HAS_MMU
+#  include <kernel/vm.h>
+#endif
+
+#ifdef HAVE_ARM_TIMER
+#  include <dev/timer/arm_generic.h>
+#endif
+
 #include <platform.h>
 #include <platform/interrupts.h>
 #include <platform/bcm28xx.h>
 
-#if BCM2836
+#if BCM2836 || BCM2835
 #include <arch/arm.h>
 #include <arch/arm/mmu.h>
 
+#if ARCH_HAS_MMU
 /* initial memory mappings. parsed by start.S */
 struct mmu_initial_mapping mmu_initial_mappings[] = {
     /* 1GB of sdram space */
@@ -54,6 +63,7 @@ struct mmu_initial_mapping mmu_initial_mappings[] = {
     /* null entry to terminate the list */
     { 0 }
 };
+#endif
 
 #define DEBUG_UART 0
 
@@ -90,19 +100,21 @@ struct mmu_initial_mapping mmu_initial_mappings[] = {
 #define DEBUG_UART 1
 
 #else
-#error Unknown BCM28XX Variant
+  #error Unknown BCM28XX Variant
 #endif
 
 extern void intc_init(void);
 extern void arm_reset(void);
 
 
+#if ARCH_HAS_MMU
 static pmm_arena_t arena = {
     .name = "sdram",
     .base = SDRAM_BASE,
     .size = MEMSIZE,
     .flags = PMM_ARENA_FLAG_KMAP,
 };
+#endif
 
 void platform_init_mmu_mappings(void) {
 }
@@ -112,7 +124,14 @@ void platform_early_init(void) {
 
     intc_init();
 
-#if BCM2837
+#ifdef VPU
+    if (xtal_freq == 19200000) {
+      switch_vpu_to_pllc();
+    }
+#endif
+
+#if BCM2835
+#elif BCM2837
     arm_generic_timer_init(INTERRUPT_ARM_LOCAL_CNTPNSIRQ, 0);
 
     /* look for a flattened device tree just before the kernel */
@@ -163,8 +182,10 @@ void platform_early_init(void) {
 #error Unknown BCM28XX Variant
 #endif
 
+#if ARCH_HAS_MMU
     /* add the main memory arena */
     pmm_add_arena(&arena);
+#endif
 
 #if BCM2837
     /* reserve the first 64k of ram, which should be holding the fdt */
@@ -215,3 +236,16 @@ int platform_dgetc(char *c, bool wait) {
     return 0;
 }
 
+void target_set_debug_led(unsigned int led, bool on) {
+  switch (led) {
+  case 0:
+#ifdef RPI4
+    gpio_set(42, on);
+#elif BCM2835==1
+    gpio_set(16, !on);
+#endif
+    break;
+  default:
+    break;
+  }
+}

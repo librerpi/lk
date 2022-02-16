@@ -8,15 +8,21 @@
 #pragma once
 
 #define SDRAM_BASE 0
-/* Note: BCM2836/BCM2837 use different peripheral base than BCM2835 */
-#define BCM_PERIPH_BASE_PHYS    (0x3f000000U)
+#ifdef ARCH_VPU
+  #define BCM_PERIPH_BASE_PHYS (0x7e000000U)
+#else
+  /* Note: BCM2836/BCM2837 use different peripheral base than BCM2835 */
+  #define BCM_PERIPH_BASE_PHYS    (0x3f000000U)
+#endif
 #define BCM_PERIPH_SIZE         (0x01100000U)
 
-#if BCM2836
-#define BCM_PERIPH_BASE_VIRT    (0xe0000000U)
+#ifdef MMIO_BASE_VIRT
+  #define BCM_PERIPH_BASE_VIRT    (MMIO_BASE_VIRT)
 #elif BCM2837
-#define BCM_PERIPH_BASE_VIRT    (0xffffffffc0000000ULL)
-#define MEMORY_APERTURE_SIZE    (1024 * 1024 * 1024)
+  #define BCM_PERIPH_BASE_VIRT    (0xffffffffc0000000ULL)
+  #define MEMORY_APERTURE_SIZE    (1024 * 1024 * 1024)
+#elif ARCH_VPU
+  #define BCM_PERIPH_BASE_VIRT    (0x7e000000U)
 #else
 #error Unknown BCM28XX Variant
 #endif
@@ -48,6 +54,26 @@
 #define BSC1_BASE               (BCM_PERIPH_BASE_VIRT + 0x804000)
 #define USB_BASE                (BCM_PERIPH_BASE_VIRT + 0x980000)
 #define MCORE_BASE              (BCM_PERIPH_BASE_VIRT + 0x0000)
+
+#define ST_CS                   (ST_BASE + 0x0)
+#define ST_CLO                  (ST_BASE + 0x4)
+#define ST_CHI                  (ST_BASE + 0x8)
+#define ST_C0                   (ST_BASE + 0xc)
+#define ST_C1                   (ST_BASE + 0x10)
+
+#define IC0_C                   (IC0_BASE + 0x0)
+#define IC0_S                   (IC0_BASE + 0x4)
+#define IC0_SRC0                (IC0_BASE + 0x8)
+#define IC0_SRC1                (IC0_BASE + 0xc)
+#define IC0_VADDR               (IC0_BASE + 0x30)
+#define IC0_WAKEUP              (IC0_BASE + 0x34)
+
+#define IC1_C                   (IC1_BASE + 0x0)
+#define IC1_S                   (IC1_BASE + 0x4)
+#define IC1_SRC0                (IC1_BASE + 0x8)
+#define IC1_SRC1                (IC1_BASE + 0xc)
+#define IC1_VADDR               (IC1_BASE + 0x30)
+#define IC1_WAKEUP              (IC1_BASE + 0x34)
 
 #define ARMCTRL_BASE            (ARM_BASE + 0x000)
 #define ARMCTRL_INTC_BASE       (ARM_BASE + 0x200)
