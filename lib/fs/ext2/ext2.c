@@ -279,7 +279,7 @@ int ext2_load_inode(ext2_t *ext2, inodenum_t num, struct ext2_inode *inode) {
     LTRACEF("read inode: mode 0x%x, size %d\n", inode->i_mode, inode->i_size);
 
     LTRACEF("loaded inode %d from disk block %d offset %d, i_uid:%d i_gid:%d i_flags:0x%x i_blocks:%d i_size:%d\n",
-        num, bnum, block_offset, inode->i_uid, inode->i_gid, inode->i_flags, inode->i_blocks, inode->i_size);
+        num, bnum, (uint32_t)block_offset, inode->i_uid, inode->i_gid, inode->i_flags, inode->i_blocks, inode->i_size);
 
     return 0;
 }

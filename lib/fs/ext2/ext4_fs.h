@@ -41,3 +41,12 @@ typedef struct {
   uint16_t ee_start_hi;
   uint32_t ee_start_lo;
 } ext4_extent;
+
+// all fields in little-endian, LE16 and LE32 must be used
+// TODO? add a variant of endian_swap_inode
+typedef struct {
+  uint32_t ei_block;
+  uint32_t ei_leaf_lo;
+  uint16_t ei_leaf_hi;
+  uint16_t ei_unused;
+} ext4_extent_idx;

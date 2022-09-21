@@ -92,3 +92,44 @@ FUNCTION(arm64_local_clean_invalidate_cache_all)
     ret
 END_FUNCTION(arm64_local_clean_invalidate_cache_all)
 
+/* void arch_disable_cache(uint flags) */
+FUNCTION(arch_disable_cache)
+  mov     x7, x0                      // save flags
+  mrs     x8, daif                    // save the old interrupt state
+  msr daifset, #2                     // interrupts disabled
+.Ldcache_disable:
+  tst     x7, #DCACHE
+  beq     .Licache_disable
+  mrs     x0, sctlr_el1
+  tst     x0, #(1<<2)                 // is the dcache already disabled?
+  beq     .Ldcache_already_disabled
+
+  bic     x0, x0, #(1<<2)
+  msr     sctlr_el1, x0
+  // flush and invalidate the dcache
+  bl      arm64_local_clean_invalidate_cache_all
+  b       .Ldcache_disable_L2
+
+.Ldcache_already_disabled:
+  bl      invalidate_cache
+
+.Ldcache_disable_L2:
+.Licache_disable:
+  tst     x7, #ICACHE
+  beq     .Ldone_disable
+
+  mrs     x0, sctlr_el1
+  bic     x0, x0, #(1<<12)
+  msr     sctlr_el1, x0
+
+.Ldone_disable:
+  // make sure the icache is always invalidated
+  ic iallu  // instruction cache invalid all to PoU
+
+  msr     daif, x8            // restore irq flags
+
+  ret
+
+invalidate_cache:
+  dmb     ishst
+  mrs     x0, clidr_el1

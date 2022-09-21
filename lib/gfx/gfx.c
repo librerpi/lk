@@ -728,7 +728,7 @@ STATIC_COMMAND_START
 STATIC_COMMAND("gfx", "gfx commands", &cmd_gfx)
 STATIC_COMMAND_END(gfx);
 
-static int gfx_draw_mandelbrot(gfx_surface *surface) {
+static int gfx_draw_mandelbrot(gfx_surface *surface, uint maxiter) {
     float a,b, dx, dy, mag, c, ci;
     uint32_t color,iter,x,y;
 
@@ -743,7 +743,7 @@ static int gfx_draw_mandelbrot(gfx_surface *surface) {
             b=0;
             mag=0;
             iter = 0;
-            while ((mag < 4.0f) && (iter < 200) ) {
+            while ((mag < 4.0f) && (iter < maxiter) ) {
                 float a1;
                 a1 = a*a - b*b + c;
                 b = 2.0f * a * b + ci;
@@ -752,7 +752,7 @@ static int gfx_draw_mandelbrot(gfx_surface *surface) {
                 iter++;
             }
             c = c + dx;
-            if (iter == 200) {
+            if (iter == maxiter) {
                 color = 0;
             } else {
                 color = 0x231AF9 * iter;
@@ -764,6 +764,8 @@ static int gfx_draw_mandelbrot(gfx_surface *surface) {
         }
         ci = ci + dy;
     }
+    lk_bigtime_t stop = current_time_hires();
+    printf("mandelbrot took %d uSec\n", (uint32_t)(stop - start));
 
     return 0;
 }
@@ -836,7 +838,9 @@ usage:
             }
         }
     } else if (!strcmp(argv[1].str, "mandelbrot")) {
-        gfx_draw_mandelbrot(surface);
+        int maxiter = 200;
+        if (argc > 2) maxiter = argv[2].u;
+        gfx_draw_mandelbrot(surface, maxiter);
     } else {
         printf("unrecognized subcommand\n");
         gfx_surface_destroy(surface);

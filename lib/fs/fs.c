@@ -352,6 +352,9 @@ status_t fs_remove_file(const char *path) {
 }
 
 ssize_t fs_read_file(filehandle *handle, void *buf, off_t offset, size_t len) {
+    LTRACEF("fs_read_file(%p, %p, %lld, %ld)\n", handle, buf, offset, len);
+    assert(handle->mount);
+    assert(handle->mount->api);
     return handle->mount->api->read(handle->cookie, buf, offset, len);
 }
 

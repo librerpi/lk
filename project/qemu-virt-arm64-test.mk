@@ -1,6 +1,10 @@
 # main project for qemu-aarch64
 MODULES += \
-	app/shell
+	lib/hexdump \
+	app/shell \
+	lib/fs/zfs \
+	#lib/cksum-helper \
+	#lib/mincrypt
 
 include project/virtual/test.mk
 include project/virtual/fs.mk

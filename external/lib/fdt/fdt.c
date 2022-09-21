@@ -212,6 +212,8 @@ uint32_t fdt_next_tag(const void *fdt, int startoffset, int *nextoffset)
 
         case 0:
                 puts("wut");
+                puts("default");
+		return FDT_END;
 	default:
                 puts("default");
 		return FDT_END;

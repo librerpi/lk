@@ -33,7 +33,7 @@ typedef int (*console_cmd_func)(int argc, const console_cmd_args *argv);
 __END_CDECLS
 
 /* Register a static block of commands at init time when lib/console is
- * paret of the build. Otherwise stub out these definitions so that they do
+ * part of the build. Otherwise stub out these definitions so that they do
  * not get included.
  */
 #if WITH_LIB_CONSOLE

@@ -11,6 +11,12 @@
 
 #include <arch/defines.h>
 
+#define KB                (1024UL)
+#define MB                (1024UL*1024UL)
+#define GB                (1024UL*1024UL*1024UL)
+
+#define SECTION_SIZE      MB
+
 #define IFTE(c,t,e) (!!(c) * (t) | !(c) * (e))
 #define NBITS01(n)      IFTE(n, 1, 0)
 #define NBITS02(n)      IFTE((n) >>  1,  1 + NBITS01((n) >>  1), NBITS01(n))
@@ -276,6 +282,7 @@ int arm64_mmu_unmap(vaddr_t vaddr, size_t size,
                     vaddr_t vaddr_base, uint top_size_shift,
                     uint top_index_shift, uint page_size_shift,
                     pte_t *top_page_table, uint asid);
+status_t arm64_vtop(addr_t va, addr_t *pa);
 
 __END_CDECLS
 #endif /* ASSEMBLY */

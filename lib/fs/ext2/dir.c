@@ -63,6 +63,7 @@ static int ext2_dir_lookup(ext2_t *ext2, struct ext2_inode *dir_inode, const cha
         while (pos < EXT2_BLOCK_SIZE(ext2->sb)) {
             ent = (struct ext2_dir_entry_2 *)&buf[pos];
 
+            // TODO, this has been caught printing 13 chars when the namelen was 12
             LTRACEF("ent %d:%d: inode 0x%x, reclen %d, namelen %d, type: %d, name '%s'\n",
                     file_blocknum, pos, LE32(ent->inode), LE16(ent->rec_len), ent->name_len, ent->file_type , ent->name);
 

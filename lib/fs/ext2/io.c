@@ -11,8 +11,9 @@
 #include <lk/debug.h>
 #include <lk/trace.h>
 #include "ext2_priv.h"
+#include <lib/hexdump.h>
 
-#define LOCAL_TRACE 0
+#define LOCAL_TRACE 1
 
 int ext2_read_block(ext2_t *ext2, void *buf, blocknum_t bnum) {
     return bcache_read_block(ext2->cache, buf, bnum);
@@ -162,6 +163,18 @@ static blocknum_t file_block_to_fs_block(ext2_t *ext2, struct ext2_inode *inode,
               block = LE32(extents[i].ee_start_lo) + (fileblock - LE32(extents[i].ee_block));
             }
           }
+        } else {
+          puts("TODO!");
+          ext4_extent_idx *extents = (ext4_extent_idx*)( ((ext4_extent_idx*)&inode->i_block) + 1);
+          for (int i=0; i < LE16(eh->eh_entries); i++) {
+#if 1
+            printf("extent %d\n", i);
+            printf("  ei_block:    %d\n", LE32(extents[i].ei_block));
+            printf("  ei_leaf_lo   %d\n", LE16(extents[i].ei_leaf_lo));
+            printf("  ei_leaf_hi:  %d\n", LE16(extents[i].ei_leaf_hi));
+#endif
+          }
+          puts("TODO!");
         }
     } else {
         uint32_t pos[4];
@@ -199,6 +212,7 @@ ssize_t ext2_read_inode(ext2_t *ext2, struct ext2_inode *inode, void *_buf, off_
     int err = 0;
     size_t bytes_read = 0;
     uint8_t *buf = _buf;
+    //size_t orig_len = len;
 
     /* calculate the file size */
     off_t file_size = ext2_file_len(ext2, inode);
@@ -281,6 +295,7 @@ ssize_t ext2_read_inode(ext2_t *ext2, struct ext2_inode *inode, void *_buf, off_
     }
 
     LTRACEF("err %d, bytes_read %zu\n", err, bytes_read);
+    //hexdump_ram(_buf, 0, orig_len);
 
     return (err < 0) ? err : (ssize_t)bytes_read;
 }

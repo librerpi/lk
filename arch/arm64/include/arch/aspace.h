@@ -25,5 +25,9 @@ struct arch_aspace {
     size_t size;
 };
 
+static inline bool arch_mmu_is_valid_vaddr(struct arch_aspace *aspace, vaddr_t vaddr) {
+    return (vaddr >= aspace->base && vaddr <= aspace->base + aspace->size - 1);
+}
+
 __END_CDECLS
 
