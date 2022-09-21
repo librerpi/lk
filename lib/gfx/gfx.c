@@ -764,8 +764,6 @@ static int gfx_draw_mandelbrot(gfx_surface *surface, uint maxiter) {
         }
         ci = ci + dy;
     }
-    lk_bigtime_t stop = current_time_hires();
-    printf("mandelbrot took %d uSec\n", (uint32_t)(stop - start));
 
     return 0;
 }
