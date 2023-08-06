@@ -28,6 +28,12 @@ _start:
     b   arm_reset
 #endif
 
+.macro putc c
+  ldr r0, =0x3f201000
+  mov r1, #\c
+  str r1, [r0]
+.endm
+
 .weak platform_reset
 platform_reset:
     /* Fall through for the weak symbol */
