@@ -197,6 +197,7 @@ typedef struct vmm_aspace {
 } vmm_aspace_t;
 
 #define VMM_ASPACE_FLAG_KERNEL 0x1
+#define VMM_ASPACE_FLAG_NULLPAGE 0x2
 
 typedef struct vmm_region {
     struct list_node node;

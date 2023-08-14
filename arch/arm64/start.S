@@ -32,6 +32,9 @@ boot_el                 .req x28
 FUNCTION(_start)
 .globl arm_reset
 arm_reset:
+    ldr x0, =19200000
+    msr     cntfrq_el0, x0
+
     /* keep track of the boot EL */
     mrs     boot_el, currentel
 

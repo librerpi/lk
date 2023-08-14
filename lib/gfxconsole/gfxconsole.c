@@ -48,7 +48,9 @@ static void gfxconsole_putc(char c) {
 
     switch (state) {
         case NORMAL: {
-            if (c == '\n' || c == '\r') {
+            if (c == '\r') {
+                gfxconsole.x = 0;
+            } else if (c == '\n' || c == '\r') {
                 gfxconsole.x = 0;
                 gfxconsole.y++;
             } else if (c == 0x1b) {

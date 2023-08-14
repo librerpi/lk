@@ -92,8 +92,84 @@ FUNCTION(arm64_local_clean_invalidate_cache_all)
     ret
 END_FUNCTION(arm64_local_clean_invalidate_cache_all)
 
+.macro putc c
+  ldr x12, =0xffffffffc0201000
+  mov x13, #\c
+  str x13, [x12]
+.endm
+
 /* void arch_disable_cache(uint flags) */
 FUNCTION(arch_disable_cache)
+  // LK runs in EL1
+
+  /* Disable iCache and dCache */
+.inEL1:
+  mrs x4, sctlr_el1
+  bic x4, x4, #(1 << 12) // Disable iCache
+  bic x4, x4, #(1 << 2)  // Disable dCache
+  msr sctlr_el1, x4
+  isb
+
+  /* Clean and Invalidate dCache */
+  mrs x0, CLIDR_EL1
+  and w3, w0, #0x07000000     // Bits: 26:24 Level of Coherence
+  lsr w3, w3, #23             // Store 2 x LoC in W3
+  cbz w3, Finished            // If 0, we are done
+  mov w10, #0                 // store 2x cache level (since csselr starts at bit 1)
+  mov w8, #1
+
+Loop1:
+  //putc 'a'
+  add w2, w10, w10, lsr #1    // Calculate 3x cache level a(w10 + 2w10 = 3w10)
+  lsr w1, w0, w2              // read cType (cache type)
+  and w1, w1, #0x7            // mask 3-bits
+  cmp w1, #2                  // types >=2 include data cache
+  b.lt Skip                   // skip if no data cache implemented
+
+  msr csselr_el1, x10         // select the cache level
+  isb                         // sync
+  mrs x1, ccsidr_el1          // read ccsidr (current cache size id)
+  and w2, w1, #0x7            // w2 = log2(linesize) - 4
+  add w2, w2, #4              // w2 = log2(linesize)
+  ubfx w4, w1, #3, #10        // w4 = way number (associativity)
+  clz w5, w4                  // w5 = 32 - log2(ways), bit pos in dc operand
+  lsl w9, w4, w5              // w9 = max way number, aligned to position in dc operand
+  lsl w16, w8, w5             // w16 = amount to decrement way number per iteration
+Loop2:
+  //putc 'b'
+  ubfx w7, w1, #13, #15       // w7 = max set number
+  lsl w7, w7, w2              // w7= max set number, aligned to position in dc operand
+  lsl w17, w8, w2             // w17 = amount to decrement set number per iteration
+Loop3:
+  //putc 'c'
+  orr w11, w10, w9            // w11 = combine way number, cache number and set num for dc operand
+  orr w11, w11, w7
+  dc cisw, x11                 // perform clean by set and way
+  subs w7, w7, w17            // decrement set number
+  b.ge Loop3
+  subs x9, x9, x16            // decrement way number
+  b.ge Loop2
+Skip:
+  //putc 'd'
+  add w10, w10, #2
+  cmp w3, w10
+  dsb sy
+  b.gt Loop1
+Finished:
+  //putc 'e'
+  /* invalidate iCache*/
+  ic ialluis
+  isb
+  //putc 'f'
+
+  /* invalidate TLB */
+  tlbi vmalle1
+  dsb sy
+  isb
+  //putc 'g'
+  ret
+FUNCTION(arch_disable_cache_unfinished)
+  putc 'a'
   mov     x7, x0                      // save flags
   mrs     x8, daif                    // save the old interrupt state
   msr daifset, #2                     // interrupts disabled
@@ -133,3 +209,7 @@ FUNCTION(arch_disable_cache)
 invalidate_cache:
   dmb     ishst
   mrs     x0, clidr_el1
+
+  b .
+literals:
+.ltorg

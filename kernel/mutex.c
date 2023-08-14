@@ -65,9 +65,12 @@ status_t mutex_acquire_timeout(mutex_t *m, lk_time_t timeout) {
     DEBUG_ASSERT(m->magic == MUTEX_MAGIC);
 
 #if LK_DEBUGLEVEL > 0
-    if (unlikely(get_current_thread() == m->holder))
+    // TODO, should throw an error if getting a mutex in irq
+    if (unlikely(get_current_thread() == m->holder)) {
+        printf("caller %p\n", __GET_CALLER());
         panic("mutex_acquire_timeout: thread %p (%s) tried to acquire mutex %p it already owns.\n",
               get_current_thread(), get_current_thread()->name, m);
+    }
 #endif
 
     THREAD_LOCK(state);

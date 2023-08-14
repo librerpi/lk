@@ -671,6 +671,9 @@ status_t vmm_create_aspace(vmm_aspace_t **_aspace, const char *name, uint flags)
     if (aspace->flags & VMM_ASPACE_FLAG_KERNEL) {
         aspace->base = KERNEL_ASPACE_BASE;
         aspace->size = KERNEL_ASPACE_SIZE;
+    } else if (aspace->flags & VMM_ASPACE_FLAG_NULLPAGE) {
+        aspace->base = 0;
+        aspace->size = 16 << 20;
     } else {
         aspace->base = USER_ASPACE_BASE;
         aspace->size = USER_ASPACE_SIZE;
