@@ -6,7 +6,7 @@ SECTIONS
 {
     . = %KERNEL_BASE% + %KERNEL_LOAD_OFFSET%;
 
-    _start = .;
+    _kernel_start = .;
 
     /* text/read-only data */
     /* set the load address to physical MEMBASE */
@@ -14,6 +14,7 @@ SECTIONS
         KEEP(*(.text.boot.vectab1))
         KEEP(*(.text.boot.vectab2))
         KEEP(*(.text.boot))
+        KEEP(*(.text._start))
         *(.text* .sram.text.glue_7* .gnu.linkonce.t.*)
     }
 
