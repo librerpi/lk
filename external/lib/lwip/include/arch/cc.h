@@ -34,8 +34,7 @@ typedef uint32_t u32_t;
 typedef int8_t s8_t;
 typedef int16_t s16_t;
 typedef int32_t s32_t;
-
-typedef intptr_t mem_ptr_t;
+typedef int sys_prot_t;
 
 #define U16_F "u"
 #define S16_F "d"
@@ -47,10 +46,12 @@ typedef intptr_t mem_ptr_t;
 
 #define LWIP_CHKSUM_ALGORITHM 2
 
-#define LWIP_PLATFORM_DIAG(x) do {} while (0)
+#define LWIP_PLATFORM_DIAG(x) printf x
 #define LWIP_PLATFORM_ASSERT(x) do {} while (0)
 
 #define PACK_STRUCT_STRUCT __PACKED
+#define LWIP_RAND() (rand())
+
 
 #endif
 

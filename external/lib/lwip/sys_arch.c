@@ -8,11 +8,16 @@
 #include <lk/err.h>
 #include <stdbool.h>
 #include <lk/init.h>
+#include <stdlib.h>
 
 #define LOCAL_TRACE 1
 
 void sys_init(void)
 {
+}
+
+u32_t sys_now(void) {
+  return current_time();
 }
 
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn func, void *arg, int stacksize, int prio)

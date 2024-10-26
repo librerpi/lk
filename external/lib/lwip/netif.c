@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <lk/list.h>
 #include <lk/err.h>
+#include <stdlib.h>
 
 #define LOCAL_TRACE 0
 
