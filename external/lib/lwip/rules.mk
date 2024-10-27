@@ -6,9 +6,11 @@ GLOBAL_INCLUDES += \
 	$(LOCAL_DIR)/upstream/src/include \
 	$(LOCAL_DIR)/upstream/src/include/posix \
 
+MODULE_FLOAT_SRCS += \
+	$(LOCAL_DIR)/cmd.c \
+
 MODULE_SRCS += \
 	$(LOCAL_DIR)/sys_arch.c \
-	$(LOCAL_DIR)/cmd.c \
 	$(LOCAL_DIR)/netif.c \
 	$(LOCAL_DIR)/upstream/src/api/api_lib.c \
 	$(LOCAL_DIR)/upstream/src/api/api_msg.c \
