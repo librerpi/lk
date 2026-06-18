@@ -59,8 +59,11 @@ MODULE_SRCS += \
 endif
 
 ifeq ($(LWIP_APP_TFTP),1)
-MODULE_SRCS += \
-	$(LOCAL_DIR)/upstream/src/apps/tftp/tftp.c
+MODULE_SRCS += $(LOCAL_DIR)/upstream/src/apps/tftp/tftp.c
+endif
+
+ifeq ($(LWIP_APP_HTTP_CLIENT),1)
+MODULE_SRCS += $(LOCAL_DIR)/upstream/src/apps/http/http_client.c
 endif
 
 include make/module.mk
